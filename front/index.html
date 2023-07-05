@@ -5,6 +5,7 @@
     <script>
         // Redirect the root URL to the /home page
         // if localstorage token exists, go to /home, else go to /login
+        // TODO: better system
         if (localStorage.getItem('token')) {
             window.location.href = '/home';
         } else {

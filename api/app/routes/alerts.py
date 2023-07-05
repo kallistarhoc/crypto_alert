@@ -80,8 +80,6 @@ def get_alert(current_user, alert_id):
         result = db.execute(query, (alert_id,)).fetchone()
         if not result or result["user_id"] != current_user["id"]:
             return jsonify({"error": "Alert not found"}), 404
-        
-        # get current exchange rate of the base and quote currencies
 
         alert = {
             "id": result["id"],
@@ -95,7 +93,6 @@ def get_alert(current_user, alert_id):
             f'https://rest.coinapi.io/v1/exchangerate/{alert["base_id"]}/{alert["quote_id"]}',
             headers=Config.HEADERS,
         )
-        print(res.json())
         if res.status_code != 200:
             return jsonify({"error": "Invalid crypto or currency"}), 400
 

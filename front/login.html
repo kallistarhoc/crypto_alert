@@ -41,22 +41,18 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
         document.getElementById('loginForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent the form from submitting
-
-            // Get the values from the input fields
+            event.preventDefault(); 
+            
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
 
-            // Create an object with the data to send
             var data = {
                 email: email,
                 password: password
             };
 
-            // Send a POST request using Axios
             axios.post('http://127.0.0.1:5000/login', data)
                 .then(function (response) {
-                    // Handle the response from the server
                     localStorage.setItem('token', response.data.token);
                     localStorage.setItem('user_id', response.data.user.id);
                     localStorage.setItem('username', response.data.user.username);
@@ -64,7 +60,6 @@
                     window.location.href = "/home";
                 })
                 .catch(function (error) {
-                    // Handle any errors that occurred during the request
                     console.error(error);
                 });
         });

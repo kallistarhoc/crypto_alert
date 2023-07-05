@@ -68,7 +68,6 @@
         </table>
     </div>
 
-    <!-- Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
         aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -94,29 +93,25 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        // Check if the user is logged in
+         
         if (!localStorage.getItem('token')) {
-            // Redirect to the login page or perform other actions
+             
             window.location.href = '/login';
         }
 
-        // Get the token and user ID from localStorage
+         
         var token = localStorage.getItem('token');
         var userId = localStorage.getItem('user_id');
-        // Get the username element
         var usernameElement = document.getElementById('username');
         usernameElement.textContent = localStorage.getItem('username');
 
-        // Fetch alerts for the user
         function logout() {
-            // Make an HTTP GET request to logout
             axios.post('http://127.0.0.1:5000/logout', {}, {
                 headers: {
                     'x-access-token': token
                 }
             })
                 .then(function (response) {
-                    // empty localstorage
                     localStorage.clear();
 
                     window.location.href = '/login';
@@ -134,7 +129,6 @@
                 var alerts = response.data.alerts;
                 var alertTableBody = document.getElementById('alertTableBody');
                 console.log(alerts);
-                // Iterate over the alerts and populate the table
                 alerts.forEach(function (alert) {
                     var row = document.createElement('tr');
                     var baseIDCell = document.createElement('td');
@@ -150,7 +144,6 @@
                     detailsButton.textContent = 'Details';
                     detailsButton.classList.add('btn', 'btn-details', 'mr-2');
                     detailsButton.addEventListener('click', function () {
-                        // Redirect to the details page with the alert ID as a parameter
                         window.location.href = 'alert.html?id=' + alert.id;
                     });
 
@@ -158,10 +151,8 @@
                     deleteButton.textContent = 'Delete';
                     deleteButton.classList.add('btn', 'btn-delete');
                     deleteButton.addEventListener('click', function () {
-                        // Show the confirmation modal for deletion
                         $('#deleteConfirmationModal').modal('show');
 
-                        // Set the alert ID to be deleted in the modal
                         var deleteAlertButton = document.getElementById('deleteAlertButton');
                         deleteAlertButton.dataset.alertId = alert.id;
                     });
@@ -181,14 +172,12 @@
                 console.error(error);
             });
 
-        // Delete Alert Button Click Event
         var deleteAlertButton = document.getElementById('deleteAlertButton');
         deleteAlertButton.addEventListener('click', function () {
             var alertId = this.dataset.alertId;
             deleteAlert(alertId);
         });
 
-        // Function to delete an alert
         function deleteAlert(alertId) {
             axios.delete('http://127.0.0.1:5000/alerts/' + alertId, {
                 headers: {
@@ -196,17 +185,14 @@
                 }
             })
                 .then(function (response) {
-                    // Handle successful deletion
                     console.log('Alert deleted successfully');
 
-                    // Refresh the page or update the UI accordingly
                     window.location.reload();
                 })
                 .catch(function (error) {
                     console.error(error);
                 })
                 .finally(function () {
-                    // Hide the confirmation modal
                     $('#deleteConfirmationModal').modal('hide');
                 });
         }

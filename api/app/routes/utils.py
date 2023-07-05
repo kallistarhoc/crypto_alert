@@ -14,15 +14,11 @@ def token_required(f):
     def decorated(*args, **kwargs):
         db = db_con()
         token = None
-        # jwt is passed in the request header
         print(request.headers)
         if "x-access-token" in request.headers:
             token = request.headers["x-access-token"]
-        # return 401 if token is not passed
-        print(token)
         if not token:
             return jsonify({"message": "Token is missing"}), 401
-        # check if token is blacklisted
         query = "SELECT * FROM blacklisted_tokens WHERE token = ?"
         blacklisted_token = db.execute(query, (token,)).fetchone()
         if blacklisted_token:
@@ -33,7 +29,6 @@ def token_required(f):
             current_user = db.execute(query, (data["id"],)).fetchone()
         except:
             return jsonify({"message": "Invalid token", "token": token}), 401
-        # returns the current logged in users context to the routes
         return f(current_user, *args, **kwargs)
 
     return decorated

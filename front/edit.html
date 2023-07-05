@@ -40,8 +40,6 @@
             </div>
         </form>
     </div>
-
-    <!-- Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
         aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -67,29 +65,26 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        // Check if the user is logged in
+
         if (!localStorage.getItem('token')) {
-            // Redirect to the login page or perform other actions
+
             window.location.href = '/login';
         }
         document.getElementById('usernameInput').placeholder = localStorage.getItem('username');
         document.getElementById('emailInput').placeholder = localStorage.getItem('email');
         document.getElementById('passwordInput').placeholder = "********";
 
-        // Get the token from localStorage
+
         var token = localStorage.getItem('token');
 
-        // Submit event listener for the edit profile form
         var editProfileForm = document.getElementById('editProfileForm');
         editProfileForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
-            // Get the form input values
             var newUsername = document.getElementById('usernameInput').value;
             var newEmail = document.getElementById('emailInput').value;
             var newPassword = document.getElementById('passwordInput').value;
 
-            // Create the payload object
             var payload = {};
 
             if (newUsername) {
@@ -107,16 +102,15 @@
                 window.location.href = '/profile';
             }
 
-            // Make the API request to update the user details
             axios.put('http://127.0.0.1:5000/users', payload, {
                 headers: {
                     'x-access-token': token
                 }
             })
                 .then(function (response) {
-                    // Handle success response, e.g., show success message
+
                     console.log('Profile updated successfully');
-                    // update local storage
+
                     if (newUsername) {
                         localStorage.setItem('username', newUsername);
                     }
@@ -127,7 +121,7 @@
                     window.location.href = '/profile';
                 })
                 .catch(function (error) {
-                    // Handle error response, e.g., show error message
+
                     console.error('Error updating profile:', error);
                 });
         });
@@ -136,8 +130,7 @@
         deleteBttn.addEventListener('click', function () {
             jQuery('#deleteConfirmationModal').modal('show');
         });
-        
-        // Delete Profile Button event listener
+
         var deleteProfileButton = document.getElementById('deleteProfileButton');
         deleteProfileButton.addEventListener('click', function () {
             axios.delete('http://127.0.0.1:5000/users', {
@@ -146,14 +139,13 @@
                 }
             })
                 .then(function (response) {
-                    // Handle success response, e.g., show success message
+
                     console.log('Profile deleted successfully');
-                    // Clear local storage and redirect to the login page
                     localStorage.clear();
                     window.location.href = '/login';
                 })
                 .catch(function (error) {
-                    // Handle error response, e.g., show error message
+
                     console.error('Error deleting profile:', error);
                 });
         });

@@ -25,7 +25,6 @@
             border-color: #dc3545;
         }
 
-        /* Additional custom styles here */
     </style>
 </head>
 <body>
@@ -41,7 +40,6 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -66,20 +64,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        // Check if the user is logged in
         if (!localStorage.getItem('token')) {
-            // Redirect to the login page or perform other actions
             window.location.href = '/login';
         }
 
-        // Get the token from localStorage
         var token = localStorage.getItem('token');
 
-        // Get the alert ID from the URL query parameter
         var urlParams = new URLSearchParams(window.location.search);
         var alertId = urlParams.get('id');
 
-        // Fetch the details of the specific alert
         axios.get('http://127.0.0.1:5000/alerts/' + alertId, {
             headers: {
                 'x-access-token': token
@@ -109,22 +102,18 @@
             jQuery('#deleteConfirmationModal').modal('show');
         });
 
-        // Delete Alert
         var confirmDeleteButton = document.getElementById('confirmDeleteButton');
         confirmDeleteButton.addEventListener('click', function() {
-            // Call the delete endpoint here and handle the response accordingly
             axios.delete('http://127.0.0.1:5000/alerts/' + alertId, {
                 headers: {
                     'x-access-token': token
                 }
             })
             .then(function (response) {
-                // Handle success response, e.g., show success message and redirect
                 console.log('Alert deleted successfully');
-                window.location.href = '/home'; // Redirect to dashboard after deletion
             })
             .catch(function (error) {
-                // Handle error response, e.g., show error message
+
                 console.error('Error deleting alert:', error);
             });
         });

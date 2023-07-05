@@ -45,16 +45,15 @@
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        // Check if the user is logged in
+         
         if (!localStorage.getItem('token')) {
-            // Redirect to the login page or perform other actions
+             
             window.location.href = '/login';
         }
 
-        // Get the token from localStorage
+         
         var token = localStorage.getItem('token');
 
-        // Get the user details and populate the profile
         axios.get('http://127.0.0.1:5000/users', {
             headers: {
                 'x-access-token': token

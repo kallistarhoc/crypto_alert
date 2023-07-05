@@ -8,7 +8,8 @@
    -  `source bin/activate `
 3. Install the dependencies: `pip3 install -r requirements.txt`.
 4. Initialize the SQLite database: `python3 init.db`.
-5. Launch the backend server: `flask run`.
+5. Export Flask app: `export FLASK_APP=app/app`
+6. Launch the backend server: `flask run`.
 
 ## Frontend Setup
 1. Navigate to the `front` folder: `cd front`.
