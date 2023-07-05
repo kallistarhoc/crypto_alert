@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        .profile-card {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-card">
+            <h1>Profile</h1>
+            <div>
+                <h3>Username: <span id="username"></span></h3>
+                <h3>Email: <span id="email"></span></h3>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a class="btn btn-primary" href="/home">Go Back</a>
+            <a class="btn btn-success" href="/edit">Edit Profile</a>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        // Check if the user is logged in
+        if (!localStorage.getItem('token')) {
+            // Redirect to the login page or perform other actions
+            window.location.href = '/login';
+        }
+
+        // Get the token from localStorage
+        var token = localStorage.getItem('token');
+
+        // Get the user details and populate the profile
+        axios.get('http://127.0.0.1:5000/users', {
+            headers: {
+                'x-access-token': token
+            }
+        })
+        .then(function (response) {
+            var user = response.data.user;
+            var usernameElement = document.getElementById('username');
+            var emailElement = document.getElementById('email');
+
+            usernameElement.textContent = user.username;
+            emailElement.textContent = user.email;
+        })
+        .catch(function (error) {
+            console.error('Error retrieving user details:', error);
+        });
+    </script>
+</body>
+</html>

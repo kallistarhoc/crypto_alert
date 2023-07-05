@@ -19,9 +19,9 @@ CREATE TABLE alerts (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-DROP TABLE IF EXISTS jwt_tokens;
+DROP TABLE IF EXISTS  blacklisted_tokens;
 
-CREATE TABLE jwt_tokens (
+CREATE TABLE  blacklisted_tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     token TEXT NOT NULL,

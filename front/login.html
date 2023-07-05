@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 400px;
+            margin-top: 100px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">Login</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        <br>
+        <p class="mt-2">Don't have an account? <a href="/register">Register</a></p>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting
+
+            // Get the values from the input fields
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            // Create an object with the data to send
+            var data = {
+                email: email,
+                password: password
+            };
+
+            // Send a POST request using Axios
+            axios.post('http://127.0.0.1:5000/login', data)
+                .then(function (response) {
+                    // Handle the response from the server
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('user_id', response.data.user.id);
+                    localStorage.setItem('username', response.data.user.username);
+                    localStorage.setItem('email', response.data.user.email);
+                    window.location.href = "/home";
+                })
+                .catch(function (error) {
+                    // Handle any errors that occurred during the request
+                    console.error(error);
+                });
+        });
+    </script>
+</body>
+
+</html>

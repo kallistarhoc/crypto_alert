@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Edit Profile</h1>
+        <a href="/home" class="btn btn-primary">Home</a>
+        <a href="/profile" class="btn btn-primary">Back</a>
+        <form id="editProfileForm">
+            <div class="form-group">
+                <label for="usernameInput">Username:</label>
+                <input type="text" class="form-control" id="usernameInput" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="emailInput">Email:</label>
+                <input type="email" class="form-control" id="emailInput" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="passwordInput">Password:</label>
+                <input type="password" class="form-control" id="passwordInput" placeholder="">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" id="delete-bttn" class="btn btn-danger">Delete</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
+        aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete your profile?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="deleteProfileButton" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        // Check if the user is logged in
+        if (!localStorage.getItem('token')) {
+            // Redirect to the login page or perform other actions
+            window.location.href = '/login';
+        }
+        document.getElementById('usernameInput').placeholder = localStorage.getItem('username');
+        document.getElementById('emailInput').placeholder = localStorage.getItem('email');
+        document.getElementById('passwordInput').placeholder = "********";
+
+        // Get the token from localStorage
+        var token = localStorage.getItem('token');
+
+        // Submit event listener for the edit profile form
+        var editProfileForm = document.getElementById('editProfileForm');
+        editProfileForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Get the form input values
+            var newUsername = document.getElementById('usernameInput').value;
+            var newEmail = document.getElementById('emailInput').value;
+            var newPassword = document.getElementById('passwordInput').value;
+
+            // Create the payload object
+            var payload = {};
+
+            if (newUsername) {
+                payload.username = newUsername;
+            }
+            if (newEmail) {
+                payload.email = newEmail;
+            }
+            if (newPassword) {
+                payload.password = newPassword;
+            }
+
+            if (Object.keys(payload).length === 0) {
+                console.log('No changes made');
+                window.location.href = '/profile';
+            }
+
+            // Make the API request to update the user details
+            axios.put('http://127.0.0.1:5000/users', payload, {
+                headers: {
+                    'x-access-token': token
+                }
+            })
+                .then(function (response) {
+                    // Handle success response, e.g., show success message
+                    console.log('Profile updated successfully');
+                    // update local storage
+                    if (newUsername) {
+                        localStorage.setItem('username', newUsername);
+                    }
+                    if (newEmail) {
+                        localStorage.setItem('email', newEmail);
+                    }
+
+                    window.location.href = '/profile';
+                })
+                .catch(function (error) {
+                    // Handle error response, e.g., show error message
+                    console.error('Error updating profile:', error);
+                });
+        });
+
+        var deleteBttn = document.getElementById('delete-bttn');
+        deleteBttn.addEventListener('click', function () {
+            jQuery('#deleteConfirmationModal').modal('show');
+        });
+        
+        // Delete Profile Button event listener
+        var deleteProfileButton = document.getElementById('deleteProfileButton');
+        deleteProfileButton.addEventListener('click', function () {
+            axios.delete('http://127.0.0.1:5000/users', {
+                headers: {
+                    'x-access-token': token
+                }
+            })
+                .then(function (response) {
+                    // Handle success response, e.g., show success message
+                    console.log('Profile deleted successfully');
+                    // Clear local storage and redirect to the login page
+                    localStorage.clear();
+                    window.location.href = '/login';
+                })
+                .catch(function (error) {
+                    // Handle error response, e.g., show error message
+                    console.error('Error deleting profile:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>

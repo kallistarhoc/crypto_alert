@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script>
+        // Redirect the root URL to the /home page
+        // if localstorage token exists, go to /home, else go to /login
+        if (localStorage.getItem('token')) {
+            window.location.href = '/home';
+        } else {
+            window.location.href = '/login';
+        }
+    </script>
+</head>
+<body>
+    <p>If you are not redirected, <a href="/home">click here</a>.</p>
+</body>
+</html>

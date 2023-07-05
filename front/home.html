@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+        }
+
+        .alert-table {
+            margin-top: 20px;
+        }
+
+        .alert-table th {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .alert-table .actions-cell {
+            white-space: nowrap;
+        }
+
+        .btn-details {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome, <span id="username"></span>!</h1>
+
+        <h2>Your Alerts</h2>
+        <div class="text-center">
+            <a href="/create_alert" class="btn btn-primary">Create New Alert</a>
+            <a class="btn btn-primary" href="/profile">View Profile</a>
+            <a class="btn btn-primary" href="#" onclick="logout()">Logout</a>
+
+        </div>
+        <table class="table alert-table">
+            <thead>
+                <tr>
+                    <th>Base Currency</th>
+                    <th>Quote Currency</th>
+                    <th>Alert</th>
+                    <th class="actions-cell">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="alertTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog"
+        aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this alert?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="deleteAlertButton" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        // Check if the user is logged in
+        if (!localStorage.getItem('token')) {
+            // Redirect to the login page or perform other actions
+            window.location.href = '/login';
+        }
+
+        // Get the token and user ID from localStorage
+        var token = localStorage.getItem('token');
+        var userId = localStorage.getItem('user_id');
+        // Get the username element
+        var usernameElement = document.getElementById('username');
+        usernameElement.textContent = localStorage.getItem('username');
+
+        // Fetch alerts for the user
+        function logout() {
+            // Make an HTTP GET request to logout
+            axios.post('http://127.0.0.1:5000/logout', {}, {
+                headers: {
+                    'x-access-token': token
+                }
+            })
+                .then(function (response) {
+                    // empty localstorage
+                    localStorage.clear();
+
+                    window.location.href = '/login';
+                })
+                .catch(function (error) {
+                    console.error('Error logging out:', error);
+                });
+        }
+        axios.get('http://127.0.0.1:5000/alerts', {
+            headers: {
+                'x-access-token': token
+            }
+        })
+            .then(function (response) {
+                var alerts = response.data.alerts;
+                var alertTableBody = document.getElementById('alertTableBody');
+                console.log(alerts);
+                // Iterate over the alerts and populate the table
+                alerts.forEach(function (alert) {
+                    var row = document.createElement('tr');
+                    var baseIDCell = document.createElement('td');
+                    var quoteIDCell = document.createElement('td');
+                    var alertConditionCell = document.createElement('td');
+                    var actionsCell = document.createElement('td');
+
+                    baseIDCell.textContent = alert.base_id;
+                    quoteIDCell.textContent = alert.quote_id;
+                    alertConditionCell.textContent = 'When 1 ' + alert.base_id + ' ' + alert.alert_condition + ' ' + alert.quote_id
+
+                    var detailsButton = document.createElement('button');
+                    detailsButton.textContent = 'Details';
+                    detailsButton.classList.add('btn', 'btn-details', 'mr-2');
+                    detailsButton.addEventListener('click', function () {
+                        // Redirect to the details page with the alert ID as a parameter
+                        window.location.href = 'alert.html?id=' + alert.id;
+                    });
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.classList.add('btn', 'btn-delete');
+                    deleteButton.addEventListener('click', function () {
+                        // Show the confirmation modal for deletion
+                        $('#deleteConfirmationModal').modal('show');
+
+                        // Set the alert ID to be deleted in the modal
+                        var deleteAlertButton = document.getElementById('deleteAlertButton');
+                        deleteAlertButton.dataset.alertId = alert.id;
+                    });
+
+                    actionsCell.appendChild(detailsButton);
+                    actionsCell.appendChild(deleteButton);
+
+                    row.appendChild(baseIDCell);
+                    row.appendChild(quoteIDCell);
+                    row.appendChild(alertConditionCell);
+                    row.appendChild(actionsCell);
+
+                    alertTableBody.appendChild(row);
+                });
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+
+        // Delete Alert Button Click Event
+        var deleteAlertButton = document.getElementById('deleteAlertButton');
+        deleteAlertButton.addEventListener('click', function () {
+            var alertId = this.dataset.alertId;
+            deleteAlert(alertId);
+        });
+
+        // Function to delete an alert
+        function deleteAlert(alertId) {
+            axios.delete('http://127.0.0.1:5000/alerts/' + alertId, {
+                headers: {
+                    'x-access-token': token
+                }
+            })
+                .then(function (response) {
+                    // Handle successful deletion
+                    console.log('Alert deleted successfully');
+
+                    // Refresh the page or update the UI accordingly
+                    window.location.reload();
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+                .finally(function () {
+                    // Hide the confirmation modal
+                    $('#deleteConfirmationModal').modal('hide');
+                });
+        }
+    </script>
+</body>
+
+</html>
